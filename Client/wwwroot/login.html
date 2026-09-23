@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>实名上机登录</title>
+    <link rel="stylesheet" href="./login.css" />
+  </head>
+  <body>
+    <main id="app" class="login" v-cloak>
+      <section class="panel">
+        <header class="title">
+          <span>实名上机登录</span>
+        </header>
+
+        <div class="login-layout">
+          <!-- 扫码登录按机房定制开通，这里只保留版式占位，不接任何接口。 -->
+          <div class="qr-side">
+            <div class="qr-card">
+              <span class="qr-box">
+                <span class="qr-placeholder">暂未开通</span>
+              </span>
+              <span class="qr-caption">扫码登录</span>
+              <span class="qr-refresh">该机房未开通，请使用账号登录</span>
+            </div>
+          </div>
+
+          <div class="form-side">
+            <form @submit.prevent="submit">
+              <label>
+                <span>账号</span>
+                <input v-model.trim="studentNo" autocomplete="username" placeholder="请输入学号、工号、身份证" />
+              </label>
+              <label>
+                <span>姓名</span>
+                <input v-model.trim="name" autocomplete="name" />
+              </label>
+              <label>
+                <span>密码</span>
+                <div class="password-control">
+                  <input
+                    v-model="password"
+                    :type="passwordVisible ? 'text' : 'password'"
+                    autocomplete="current-password"
+                    inputmode="latin"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    @beforeinput="onPasswordBeforeInput"
+                    @input="onPasswordInput"
+                    @paste="onPasswordPaste"
+                  />
+                  <button
+                    type="button"
+                    class="password-toggle"
+                    :class="{ active: passwordVisible }"
+                    @click="passwordVisible = !passwordVisible"
+                    :aria-label="passwordVisible ? '隐藏密码' : '显示密码'"
+                    :title="passwordVisible ? '隐藏密码' : '显示密码'"
+                  ></button>
+                </div>
+              </label>
+              <div class="actions">
+                <button type="submit" :disabled="loading || loginCooldown > 0 || !ipAllowed">
+                  {{ loading ? '正在登录...' : loginCooldown > 0 ? `${loginCooldown}秒后再试` : '登录' }}
+                </button>
+                <button v-if="faultEnabled" type="button" class="repair" @click="openFaultDialog" :disabled="loading">故障报修</button>
+              </div>
+            </form>
+            <p v-if="idleShutdownRemainingSeconds > 0" class="idle-shutdown">
+              长时间未登录将在{{ idleShutdownText() }}后自动关机
+            </p>
+            <p class="message" :class="messageType">{{ message }}</p>
+          </div>
+        </div>
+
+        <div class="tips">
+          <p>1、登录前，请确认显示器、键盘、鼠标、机箱等是否完好;</p>
+          <p v-if="faultEnabled">2、如发现以上有问题，请点击故障报修进行报备;</p>
+          <p v-else>2、如发现以上有问题，请不要输入账号信息登录，请联系机房管理员报备;</p>
+        </div>
+      </section>
+
+      <transition name="modal-fade">
+        <div v-if="faultDialogVisible" class="modal-mask">
+          <transition name="dialog-slide" mode="out-in">
+            <section v-if="!faultConfirmVisible" key="fault-form" class="fault-dialog" role="dialog" aria-modal="true" aria-labelledby="faultTitle">
+              <header>
+                <h2 id="faultTitle">故障报修</h2>
+                <button type="button" class="icon-button" @click="closeFaultDialog" :disabled="faultSubmitting || faultChecking" aria-label="关闭">×</button>
+              </header>
+
+              <label class="dialog-field">
+                <span>选择类型</span>
+                <select v-model="faultType">
+                  <option v-for="type in faultTypes" :key="type" :value="type">{{ type }}</option>
+                </select>
+              </label>
+
+              <label class="dialog-field">
+                <span>账号</span>
+                <input v-model.trim="faultStudentNo" autocomplete="off" placeholder="请输入学号、工号、身份证或手机号" />
+              </label>
+
+              <label class="dialog-field">
+                <span>详细描述</span>
+                <textarea v-model.trim="faultDescription" placeholder="请描述故障现象，例如无法开机、鼠标失灵、显示器无信号等"></textarea>
+              </label>
+
+              <button type="button" class="submit-fault" @click="submitFault" :disabled="faultSubmitting || faultChecking">
+                {{ faultChecking ? '检测中...' : faultSubmitting ? '提交中...' : '提交' }}
+              </button>
+            </section>
+
+            <section v-else key="fault-confirm" class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="faultConfirmTitle">
+              <div class="confirm-mark">!</div>
+              <h2 id="faultConfirmTitle">确认提交吗？</h2>
+              <p class="confirm-warning">请确认报修信息真实准确。恶意提交可能导致账号暂停使用。</p>
+              <div class="confirm-actions">
+                <button type="button" class="confirm-secondary" @click="cancelFaultConfirm" :disabled="faultSubmitting">返回修改</button>
+                <button type="button" class="confirm-primary" @click="confirmFaultSubmit" :disabled="faultSubmitting">
+                  {{ faultSubmitting ? '提交中...' : '确认提交' }}
+                </button>
+              </div>
+            </section>
+          </transition>
+        </div>
+      </transition>
+
+      <transition name="modal-fade">
+        <div v-if="loginConflictVisible" class="modal-mask">
+          <section class="confirm-dialog takeover-dialog" role="dialog" aria-modal="true" aria-labelledby="takeoverTitle">
+            <div class="confirm-mark">!</div>
+            <h2 id="takeoverTitle">该账号已在其他电脑登录</h2>
+            <p>是否下线原电脑并登录此电脑？</p>
+            <div class="takeover-details">
+              <div>
+                <span>教室</span>
+                <strong>{{ activeLoginValue('classroomName', '未匹配教室') }}</strong>
+              </div>
+              <div>
+                <span>位置</span>
+                <strong>{{ activeLoginValue('activePlace', activeLoginValue('classroomName', '其他电脑')) }}</strong>
+              </div>
+              <div>
+                <span>设备</span>
+                <strong>{{ activeLoginValue('machineName', activeLoginValue('machineId', '未知设备')) }}</strong>
+              </div>
+            </div>
+            <div class="confirm-actions">
+              <button type="button" class="confirm-secondary" @click="cancelTakeoverLogin" :disabled="takeoverSubmitting">取消</button>
+              <button type="button" class="confirm-primary" @click="confirmTakeoverLogin" :disabled="takeoverSubmitting">
+                {{ takeoverSubmitting ? '登录中...' : '下线并登录' }}
+              </button>
+            </div>
+          </section>
+        </div>
+      </transition>
+
+      <transition name="modal-fade">
+        <div v-if="powerConfirmAction" class="modal-mask" @click.self="cancelPower">
+          <section
+            ref="powerDialog"
+            class="power-confirm-dialog"
+            :class="`is-${powerConfirmAction}`"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="powerConfirmTitle"
+            aria-describedby="powerConfirmDescription"
+          >
+            <div class="power-confirm-heading">
+              <div class="power-confirm-mark" aria-hidden="true">
+                <svg v-if="powerConfirmAction === 'restart'" viewBox="0 0 24 24" focusable="false">
+                  <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                  <path d="M21 3v5h-5" />
+                </svg>
+                <svg v-else viewBox="0 0 24 24" focusable="false">
+                  <path d="M12 3v8" />
+                  <path d="M7.05 5.55a8 8 0 1 0 9.9 0" />
+                </svg>
+              </div>
+              <button ref="powerClose" type="button" class="power-confirm-close" @click="cancelPower" aria-label="关闭确认弹窗" title="关闭">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="m6 6 12 12" />
+                  <path d="m18 6-12 12" />
+                </svg>
+              </button>
+            </div>
+            <div class="power-confirm-content">
+              <h2 id="powerConfirmTitle">确认{{ powerConfirmAction === 'restart' ? '重启' : '关机' }}吗？</h2>
+              <p id="powerConfirmDescription">
+                {{ powerConfirmAction === 'restart' ? '电脑将立即重启，请先保存正在处理的内容。' : '电脑将立即关机，请先保存正在处理的内容。' }}
+              </p>
+            </div>
+            <div class="power-confirm-actions">
+              <button ref="powerCancel" type="button" class="power-confirm-secondary" @click="cancelPower">取消</button>
+              <button type="button" class="power-confirm-primary" @click="confirmPower">
+                {{ powerConfirmAction === 'restart' ? '立即重启' : '立即关机' }}
+              </button>
+            </div>
+          </section>
+        </div>
+      </transition>
+
+      <div class="toast" :class="[toastType, { show: toastVisible }]">{{ toastMessage }}</div>
+
+      <div class="power-menu" :class="{ open: powerMenuVisible }">
+        <div id="powerOptions" class="power-options">
+          <button type="button" class="power-shutdown" @click="requestPower('shutdown')">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 3v8" />
+              <path d="M7.05 5.55a8 8 0 1 0 9.9 0" />
+            </svg>
+            <span>关机</span>
+          </button>
+          <button type="button" class="power-restart" @click="requestPower('restart')">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+              <path d="M21 3v5h-5" />
+            </svg>
+            <span>重启</span>
+          </button>
+        </div>
+        <button
+          ref="powerTrigger"
+          type="button"
+          class="power-trigger"
+          @click="powerMenuVisible = !powerMenuVisible"
+          aria-label="电源选项"
+          title="电源选项"
+          :aria-expanded="powerMenuVisible ? 'true' : 'false'"
+          aria-controls="powerOptions"
+        >
+          <svg class="power-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 3v8" />
+            <path d="M7.05 5.55a8 8 0 1 0 9.9 0" />
+          </svg>
+        </button>
+      </div>
+    </main>
+
+    <script src="./vendor/vue.global.prod.js"></script>
+    <script src="./login.js"></script>
+  </body>
+</html>

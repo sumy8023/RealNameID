@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <!-- .NET 9 起 apphost/singlefilehost 默认带 Intel CET 兼容标记（/CETCOMPAT）。
+         Windows 10 21H2（19044）内核对 CET 支持不完整，带该标记的进程会在托管代码执行前
+         fail-fast 退出（应用日志 0x80131506），表现为双击 EXE 毫无反应。机房客户机多为
+         Win10 21H2，故发布时关闭该标记。 -->
+    <CETCompat>false</CETCompat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4022.49" />
+    <PackageReference Include="System.Management" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Common\BootLogReset.cs" Link="BootLogReset.cs" />
+    <EmbeddedResource Include="wwwroot\**\*" />
+    <EmbeddedResource Include="appsettings.jsonc" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="appsettings.jsonc" />
+    <None Include="appsettings.jsonc"
+          Condition="'$(Configuration)' == 'Debug'"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="Never" />
+  </ItemGroup>
+
+</Project>

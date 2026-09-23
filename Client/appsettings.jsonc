@@ -1,0 +1,34 @@
+{
+  // 后端 Node API 地址。客户端登录、心跳、报修都会请求这里。
+  // 这是本地启动入口配置，不由 Vue 后台下发。
+  "ServerUrl": "http://127.0.0.1:14848",
+  // 本地锁屏全屏兜底。Node 不可用或首次配置未返回时按这里执行；Node 正常后由 Vue 后台的“锁屏全屏”覆盖。
+  "FullScreen": false,
+
+  // 客户端心跳间隔兜底，单位秒。Node 正常后由 Vue 后台“客户端心跳间隔”覆盖，程序最小值 3 秒。
+  "HeartbeatSeconds": 5,
+
+  // 已登录状态下连续心跳失败后本地锁回登录页的次数，0 表示关闭。Node 正常后由 Vue 后台“心跳失败锁定次数”覆盖。
+  "HeartbeatFailLockCount": 0,
+
+  // 客户端请求 Node 接口的超时秒数。Node 正常后由 Vue 后台“请求超时秒”覆盖，程序最小值 5 秒。
+  "HttpTimeoutSeconds": 10,
+
+  // 客户端多久刷新一次后端动态配置，单位秒。Node 正常后由 Vue 后台“配置刷新秒”覆盖，程序最小值 3 秒。
+  "ConfigRefreshSeconds": 15,
+
+  // 客户端写入 C:\ProgramData\RealNameSimple\client.alive 的间隔秒数。Node 正常后由 Vue 后台“活性刷新秒”覆盖。
+  "ClientAliveSeconds": 5,
+
+  // 是否允许客户端启动时用本机 session.json 恢复未结束会话。Node 正常后由 Vue 后台“恢复会话”覆盖。
+  "RestoreSessionEnabled": true,
+
+  // 登录按钮快速重复点击判定窗口，单位毫秒。只属于客户端本地配置，不由 Node 下发。
+  "LoginFastClickMs": 1000,
+
+  // 登录快速重复点击后的冷却秒数。只属于客户端本地配置，不由 Node 下发。
+  "LoginCooldownSeconds": 3,
+
+  // 是否显示故障报修入口。Node 正常后由 Vue 后台“故障报修”覆盖。
+  "FaultEnabled": true
+}

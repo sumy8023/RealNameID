@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/Client/">
+    <Project Path="Client/RealName.SimpleClient.csproj" />
+  </Folder>
+  <Folder Name="/WatchdogService/">
+    <Project Path="WatchdogService/RealName.SimpleWatchdogService.csproj" />
+  </Folder>
+</Solution>

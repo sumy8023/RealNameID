@@ -1,0 +1,32 @@
+{
+  // Node 后端地址。Watchdog 会请求 /api/client-policy 和 /api/heartbeat。
+  // 这是 Watchdog 启动入口配置，不由 Vue 后台下发。
+  "ServerUrl": "http://127.0.0.1:14848",
+  //"ServerUrl": "http://127.0.0.1:14848",
+  // 客户端 EXE 路径兜底。Node 正常后由 Vue 后台“客户端路径”覆盖；Node 不可用或配置非法时使用这里。
+  "ClientPath": "C:\\Program Files\\RealNameSimple\\Client\\RealName.SimpleClient.exe",
+
+  // Watchdog 主检查间隔，单位秒。Node 正常后由 Vue 后台“主检查秒”覆盖，程序最小值 1 秒。
+  "CheckSeconds": 2,
+
+  // 教室策略和 Watchdog 配置刷新间隔，单位秒。Node 正常后由 Vue 后台“策略刷新秒”覆盖，程序最小值 2 秒。
+  "PolicySeconds": 15,
+
+  // 本机会话兜底检查间隔，单位秒。Node 正常后由 Vue 后台“会话检查秒”覆盖，程序最小值 1 秒。
+  "SessionSeconds": 5,
+
+  // 客户端无响应判定秒数，0 表示关闭。Node 正常后由 Vue 后台“无响应秒”覆盖。
+  "AliveStaleSeconds": 0,
+
+  // Watchdog 请求 Node 的超时秒数。Node 正常后由 Vue 后台“请求超时秒”覆盖，程序最小值 1 秒。
+  "HttpTimeoutSeconds": 5,
+
+  // 相同错误日志重复写入冷却秒数，0 表示同一类错误在本次进程生命周期内只写一次。Node 正常后由 Vue 后台“日志冷却秒”覆盖。
+  "RetryLogSeconds": 30,
+
+  // 是否启用会话守护。Node 正常后由 Vue 后台“会话守护”覆盖。
+  "SessionGuard": true,
+
+  // 是否启用客户端无响应检测。Node 正常后由 Vue 后台“无响应守护”覆盖。
+  "AliveGuard": false
+}

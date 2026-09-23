@@ -1,0 +1,26 @@
+bin/
+obj/
+dist/
+node_modules/
+.vs/
+.vscode/
+*.user
+*.suo
+*.log
+*.tmp
+*.cache
+*.nupkg
+TestResults/
+*.WebView2/
+**/*.exe.WebView2/
+
+# 编译产物与本机环境（发布包内嵌配置，公开仓库前确认这些已忽略）
+build/
+.env
+.env.local
+
+# vite 的界面产物直接落到 BFF 静态目录，由 vue/一键编译管理后台.bat 重建，不入库
+vue/server/web/
+
+# 后端与 BFF 的运行期日志目录
+runtime/

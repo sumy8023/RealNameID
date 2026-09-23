@@ -25,20 +25,20 @@ export const config = {
     connectionLimit: 10,
   },
   auth: {
-    // 会话滑动有效期，单位：秒；与 PHP 后台的 10800 秒保持一致，避免两套后台体验不同。
+    // 会话滑动有效期，单位：秒；默认值为 10800 秒。
     ttlSeconds: 10800,
     cookieName: "smsj_admin_token",
-    // 同一账号连续失败达到该次数后锁定，单位：次；沿用 PHP 的 tp_login_attempts 计数。
+    // 同一账号连续失败达到该次数后锁定，单位：次；使用 tp_login_attempts 计数。
     maxFailedAttempts: 3,
-    // 锁定时长，单位：分钟；与 PHP 的 10 分钟一致。
+    // 锁定时长，单位：分钟；默认 10 分钟。
     lockMinutes: 10,
-    // 复用 tp_admin 的弱口令拦截：不满足时拒登，提示与 PHP 同文案。
+    // 复用 tp_admin 的弱口令拦截：不满足时拒登。
     rejectWeakPassword: true,
   },
   node: {
     // 连接节点的超时，单位：毫秒。节点都在局域网内，正常只需几毫秒。
     connectTimeoutMs: 800,
-    // 等响应体的超时，单位：毫秒。多节点扇出已改并发，这里比 PHP 的 2 秒略宽。
+    // 等响应体的超时，单位：毫秒。多节点请求采用并发扇出。
     responseTimeoutMs: 3000,
     // 健康探测的总超时，单位：毫秒。
     probeTimeoutMs: 1500,
@@ -50,15 +50,15 @@ export const config = {
     scanLimit: 5000,
   },
   tables: {
-    // 节点登记表：全系统唯一一份，在学籍库，PHP 后台一直在维护，本次继续共用。
+    // 节点登记表：全系统唯一一份，保存在账号库中供后台共用。
     nodes: "tp_smsj_nodes",
     // 管理员表：复用校区后台账号体系，不新建管理员。
     admins: "tp_admin",
-    // 登录失败计数表：与 PHP 登录共用同一份状态，两个后台共享防爆破。
+    // 登录失败计数表：管理后台共用同一份状态，统一防止暴力尝试。
     loginAttempts: "tp_login_attempts",
   },
   // 配置页"程序兜底值 / 最小值"提示的常量来源。
-  // 遗留 PHP 后台是靠读磁盘上的客户端源码取这些值的，那个目录在开发机上并不存在，
+  // 参数兜底值来自客户端和 Watchdog 的本地配置；源码目录在开发机上可能不存在，
   // 所以它一直显示的是硬编码旧值。这里以 Client/appsettings.jsonc 与
   // WatchdogService/watchdogsettings.jsonc 的现状为准，改那两个文件时要同步这里。
   // server 组的兜底值由各节点自己通过 get_config 返回，不在此维护。

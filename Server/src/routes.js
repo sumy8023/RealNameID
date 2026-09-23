@@ -72,7 +72,7 @@ export function createApp() {
     }
   });
 
-  // PHP节点管理健康检查：必须携带与当前Node本地配置一致的注册密钥。
+  // 节点管理健康检查：必须携带与当前 Node 本地配置一致的注册密钥。
   app.get("/api/node/health", async (req, res) => {
     const key = String(req.get("x-node-registration-key") ?? "").trim();
     if (!nodeRegistrationKey) {

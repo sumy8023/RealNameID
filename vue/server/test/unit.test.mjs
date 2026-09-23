@@ -16,7 +16,7 @@ test("ISO 时间统一成东八区墙钟，非时间字符串原样保留", () =
   assert.equal(out.last_seen_at, "2026-09-21 15:00:00");
   assert.equal(out.nested[0].created_at, "2026-09-21 15:00:00");
   assert.equal(out.name, "2026-09-21 15:00:00");
-  // 07:00+02:00 是 05:00 UTC，东八区即 13:00；与 PHP 的 strtotime + 8h 结果一致。
+  // 07:00+02:00 是 05:00 UTC，东八区即 13:00；与统一的东八区换算规则一致。
   assert.equal(out.plus, "2026-09-21 13:00:00");
   assert.equal(out.count, 12);
   assert.equal(out.maybe, null);
@@ -47,7 +47,7 @@ test("转发 payload 丢掉缓存位、数组和空值", () => {
   );
 });
 
-test("分页夹取与 PHP 的 pageLimit 一致", () => {
+test("分页夹取遵循统一的 pageLimit 规则", () => {
   assert.deepEqual(pageLimit({}), { page: 1, limit: 20, offset: 0 });
   assert.deepEqual(pageLimit({ page: "0", limit: "99999" }), { page: 1, limit: 500, offset: 0 });
   assert.deepEqual(pageLimit({ page: "3", limit: "50" }), { page: 3, limit: 50, offset: 100 });
@@ -83,7 +83,7 @@ test("复合教室ID拆出节点编号，普通数字ID原样透传", () => {
   assert.deepEqual(splitCompositeClassroom({ classroom_id: "TESTA@42", node_code: "" }), { nodeCode: "TESTA", classroomId: "42" });
   assert.deepEqual(splitCompositeClassroom({ classroom_id: "42", node_code: "TESTB" }), { nodeCode: "TESTB", classroomId: "42" });
   // GLOBAL@42 的编号部分同样匹配节点编号语法，会被拆出来；随后在节点校验那一步被拒，
-  // 这与 PHP 的 routeCompositeClassroomInput + requiredNodeCode 组合行为一致。
+  // 这与路由参数归一化和节点编号校验规则一致。
   assert.deepEqual(splitCompositeClassroom({ classroom_id: "GLOBAL@42", node_code: "TESTB" }), { nodeCode: "GLOBAL", classroomId: "42" });
   assert.deepEqual(splitCompositeClassroom({ classroom_id: "", node_code: "TESTB" }), { nodeCode: "TESTB", classroomId: "" });
 });

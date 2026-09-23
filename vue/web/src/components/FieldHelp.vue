@@ -1,7 +1,7 @@
 <script setup>
 import { QuestionFilled } from "@element-plus/icons-vue";
 
-// 参数配置、节点弹窗、教室弹窗共用同一种说明浮层：标题 + 正文 + 可选底栏，结构对齐 PHP 的 layer.tips。
+// 参数配置、节点弹窗、教室弹窗共用同一种说明浮层：标题 + 正文 + 可选底栏。
 defineProps({
   label: { type: String, required: true },
   text: { type: String, required: true },

@@ -10,8 +10,7 @@ const KNOWN_EVENTS = [
   "故障报修", "教室停用", "接口错误",
 ];
 
-// 历史日志里管理后台的来源仍是旧值，显示上统一成"管理后台"，避免出现两种叫法。
-const ADMIN_SOURCES = ["Vue后台", "PHP后台"];
+const ADMIN_SOURCES = ["Vue后台"];
 function sourceText(value) {
   if (!value) return "-";
   if (value === "Node") return "后端服务";

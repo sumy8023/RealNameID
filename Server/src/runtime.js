@@ -29,7 +29,7 @@ if (configuredNodeCode !== "" && !/^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/.test(config
   throw new Error("server.nodeCode 格式不正确：只能使用字母、数字、下划线和短横线，且首字符必须为字母或数字。");
 }
 export const nodeCode = configuredNodeCode || "GLOBAL";
-// 注册密钥只用于 PHP 的受保护节点管理健康检查，不会下发给客户端或 Watchdog。
+// 注册密钥只用于受保护的节点管理健康检查，不会下发给客户端或 Watchdog。
 const configuredNodeRegistrationKey = String(runtimeConfig.nodeRegistrationKey ?? "").trim();
 if (configuredNodeRegistrationKey !== "" && !/^[A-Za-z0-9]{6,128}$/.test(configuredNodeRegistrationKey)) {
   throw new Error("server.nodeRegistrationKey 格式不正确：必须为6到128位英文字母和数字。");

@@ -189,7 +189,7 @@ body.smsj-ui {
   font-size: 13.5px; font-weight: 650; color: var(--ink);
 }
 .smsj-group-title .count { color: var(--muted); font-weight: 400; }
-/* 小节标题：PHP 配置页每个 tab 内还有"会话与超时""守护策略"这类分组，压平后会丢层级。 */
+/* 小节标题：配置页按会话、超时和守护策略分组，压平后会丢层级。 */
 .smsj-section-subtitle {
   display: flex; align-items: center; gap: 6px; margin: 10px 0 8px;
   color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: .04em;
@@ -197,7 +197,7 @@ body.smsj-ui {
 .smsj-section-subtitle::before { content: ""; width: 3px; height: 11px; border-radius: 2px; background: var(--brand-200); }
 .smsj-form-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--line); }
 
-/* ---------- 查看说明浮层：标题 + 正文 + 底栏，与 PHP 的 layer.tips 同构 ---------- */
+/* ---------- 查看说明浮层：标题 + 正文 + 底栏，统一使用项目组件 ---------- */
 .smsj-help-pop { border-radius: 10px !important; box-shadow: 0 4px 16px -6px rgba(16, 29, 43, .18) !important; }
 .smsj-help-pop-title { margin: 0 0 5px; color: var(--ink); font-size: 13px; font-weight: 650; }
 .smsj-help-pop-text { margin: 0; color: var(--ink-2); font-size: 12.5px; line-height: 20px; overflow-wrap: anywhere; }

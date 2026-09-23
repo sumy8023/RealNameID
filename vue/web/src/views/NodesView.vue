@@ -137,7 +137,7 @@ onMounted(reload);
     <div v-else class="smsj-empty">还没有登记后端节点，先点「登记节点」把第一台后端接进来。</div>
 
     <el-dialog v-model="dialog" :title="form.original_node_code ? '编辑节点' : '登记节点'" width="560px" destroy-on-close>
-      <!-- 小节标题与四条说明正文照 PHP Tpl/smsj_system/nodes.html 搬运 -->
+      <!-- 小节标题与说明正文统一维护在当前界面组件中 -->
       <h4 class="smsj-section-subtitle">基本信息</h4>
       <el-form label-width="110px">
         <el-form-item label="节点编号" required>

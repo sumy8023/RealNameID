@@ -14,7 +14,7 @@ export function nowTimestamp() {
   return String(Math.floor(Date.now() / 1000));
 }
 
-// PHP 侧因为 DEFAULT_FILTER=htmlspecialchars 会把收到的参数转义一遍，转发前要解码；
+// 请求侧因为 DEFAULT_FILTER=htmlspecialchars 会把收到的参数转义一遍，转发前要解码；
 // BFF 不做全局转义，浏览器提交什么就是什么，所以这里只需剔除缓存位和数组型参数。
 export function buildPayload(source, { operatorName } = {}) {
   const payload = {};

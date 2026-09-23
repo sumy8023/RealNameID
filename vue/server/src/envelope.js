@@ -1,4 +1,4 @@
-// 响应外壳：逐字对齐 PHP 的 ajaxOk / ajaxFail / tableReturn，前端不需要为两套后台写分支。
+// 响应外壳统一包含 code、msg、data 和 count，前端不需要为不同实现写分支。
 // 关键差异点：ajaxOk 把 data 平铺到顶层，不包一层 data。
 
 // 业务失败：message 直接进外壳的 msg 字段，httpStatus 只在鉴权等少数场景用非 200。

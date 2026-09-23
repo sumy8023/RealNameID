@@ -2026,19 +2026,14 @@ public partial class MainWindow : Window
         });
     }
 
-    // 生成 API 路径，兼容纯 Node 地址和旧 PHP 转发入口形式。
+    // 生成后端 API 路径。
     private string ApiPath(string path)
     {
         var basePath = _http.BaseAddress?.AbsolutePath.TrimEnd('/') ?? "";
         var normalizedPath = "/" + path.TrimStart('/');
 
-        // 如果 BaseAddress 是 xxx.php，则把真实 API 放到 path 参数里。
-        if (basePath.EndsWith(".php", StringComparison.OrdinalIgnoreCase))
-        {
-            return $"{basePath}?path={Uri.EscapeDataString(normalizedPath)}";
-        }
-
-        // 常规 Node 后端地址直接使用 /api/...。
+        // 客户端只连接后端节点的标准 API 路径。
+        // 常规后端地址直接使用 /api/...。
         if (string.IsNullOrWhiteSpace(basePath) || basePath == "/")
         {
             return normalizedPath;

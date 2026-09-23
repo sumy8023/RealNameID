@@ -150,7 +150,7 @@ export async function ensureSchema() {
       message VARCHAR(500) NOT NULL COMMENT '日志内容',
       operator_name VARCHAR(100) NULL COMMENT '操作人名称，取值为后台登录名',
       log_level VARCHAR(16) NOT NULL DEFAULT 'info' COMMENT '日志级别：info普通，warning警告，error错误',
-      log_source VARCHAR(32) NOT NULL DEFAULT 'Node' COMMENT '日志来源：Node、Vue后台、PHP后台（历史值）、客户端、Watchdog等',
+      log_source VARCHAR(32) NOT NULL DEFAULT 'Node' COMMENT '日志来源：Node、Vue后台、客户端、Watchdog等',
       machine_id VARCHAR(128) NULL COMMENT '关联设备机器唯一ID，可为空',
       machine_name VARCHAR(128) NULL COMMENT '关联设备主机名',
       ip_address VARCHAR(64) NULL COMMENT '关联设备IP地址',
@@ -507,7 +507,7 @@ async function migrateConfigTable(table, nodeCodeComment) {
 
 // 兼容早期最小版遗留表名，只有新表不存在时才改名。
 async function migrateLegacyTables() {
-  // 节点登记统一保存在PHP所在的xueji库；业务库中的同名表是旧架构冗余副本。
+  // 节点登记统一保存在账号库；业务库中的同名表是旧架构冗余副本。
   await dropTable("tp_smsj_nodes");
   if (manageLocalStudentTable) {
     await renameTableIfNeeded("tp_smsj_student", tables.students);
@@ -583,7 +583,7 @@ async function migrateClassroomColumns() {
 async function migrateLogColumns() {
   await ensureColumn(tables.logs, "operator_name", `ALTER TABLE ${tables.logs} ADD COLUMN operator_name VARCHAR(100) NULL COMMENT '操作人名称，取值为后台登录名' AFTER message`);
   await ensureColumn(tables.logs, "log_level", `ALTER TABLE ${tables.logs} ADD COLUMN log_level VARCHAR(16) NOT NULL DEFAULT 'info' COMMENT '日志级别：info普通，warning警告，error错误' AFTER operator_name`);
-  await ensureColumn(tables.logs, "log_source", `ALTER TABLE ${tables.logs} ADD COLUMN log_source VARCHAR(32) NOT NULL DEFAULT 'Node' COMMENT '日志来源：Node、Vue后台、PHP后台（历史值）、客户端、Watchdog等' AFTER log_level`);
+  await ensureColumn(tables.logs, "log_source", `ALTER TABLE ${tables.logs} ADD COLUMN log_source VARCHAR(32) NOT NULL DEFAULT 'Node' COMMENT '日志来源：Node、Vue后台、客户端、Watchdog等' AFTER log_level`);
   await ensureColumn(tables.logs, "machine_name", `ALTER TABLE ${tables.logs} ADD COLUMN machine_name VARCHAR(128) NULL COMMENT '关联设备主机名' AFTER machine_id`);
   await ensureColumn(tables.logs, "ip_address", `ALTER TABLE ${tables.logs} ADD COLUMN ip_address VARCHAR(64) NULL COMMENT '关联设备IP地址' AFTER machine_name`);
   await ensureColumn(tables.logs, "mac_address", `ALTER TABLE ${tables.logs} ADD COLUMN mac_address VARCHAR(64) NULL COMMENT '关联设备MAC地址' AFTER ip_address`);

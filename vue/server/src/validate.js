@@ -3,7 +3,7 @@ import { config } from "./config.js";
 export const NODE_CODE_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
 export const COMPOSITE_ID_RE = /^([A-Za-z0-9][A-Za-z0-9_-]{0,63})@(\d+)$/;
 
-// 浏览器可能用 query、表单或 JSON 提交，统一成一份参数表，语义等价 PHP 的 $_REQUEST。
+// 浏览器可能用 query、表单或 JSON 提交，统一成一份参数表。
 export function readParams(req) {
   return { ...(req.query || {}), ...(req.body || {}) };
 }
@@ -23,7 +23,7 @@ export function numberValue(params, key, { fallback = 0, min = null, max = null 
   return value;
 }
 
-// 与 PHP 的 boolInput 一致：只有明确的真值算开，其余（含空串、"false"）一律关。
+// 布尔参数只有明确的真值算开，其余（含空串、"false"）一律关。
 export function boolValue(params, key, fallback = 0) {
   const raw = params?.[key];
   if (raw === undefined || raw === null) return fallback ? 1 : 0;
@@ -38,8 +38,8 @@ export function pageLimit(params) {
   return { page, limit, offset: (page - 1) * limit };
 }
 
-// PHP 只认 `date`（"YYYY-MM-DD - YYYY-MM-DD"），且 start_date/end_date 完全失效、
-// 波浪号写法会让日期筛选静默失效。这里把三种写法统一折成节点认识的 `date`。
+// 日期参数统一认 `date`（"YYYY-MM-DD - YYYY-MM-DD"），并兼容 start_date/end_date 写法，
+// 将三种输入统一折成节点认识的 `date`。
 export function dateFilter(params) {
   const raw = text(params, "date");
   if (raw) {

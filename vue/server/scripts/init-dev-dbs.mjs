@@ -73,7 +73,7 @@ await conn.query(`CREATE TABLE IF NOT EXISTS tp_login_attempts (
   ip_address VARCHAR(64) NULL COMMENT '来源IP',
   login_attempts INT NOT NULL DEFAULT 0 COMMENT '累计失败次数',
   KEY idx_user_id (user_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='登录失败计数表，与 PHP 登录同结构'`);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='登录失败计数表，与 管理后台 登录同结构'`);
 
 // 节点登记表由 BFF 启动时自建，这里提前建好方便直接插开发节点。
 await conn.query(`CREATE TABLE IF NOT EXISTS tp_smsj_nodes (

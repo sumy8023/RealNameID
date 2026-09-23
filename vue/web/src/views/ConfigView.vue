@@ -6,8 +6,7 @@ import NodePicker from "../components/NodePicker.vue";
 import { useNodes } from "../composables/useNodes.js";
 import { api } from "../api/client.js";
 
-// 字段标签、小节分组和 help 正文逐字来自 PHP 模板 Tpl/smsj_system/config.html（扫码登录小节已随定制功能移除）。
-// 要改文案就先改 PHP 对岸再同步这里，不要凭印象重写，否则又会变成只有兜底值那一行。
+// 字段标签、小节分组和 help 正文由当前管理后台统一维护。
 const GROUPS = {
   server: {
     title: "服务端配置",
@@ -67,7 +66,7 @@ const GROUPS = {
       {
         title: "启动与通信",
         fields: [
-          // PHP 对客户端路径隐藏底栏：一条 UNC 路径谈不上"兜底值"，显示出来只会误导到复制粘贴。
+          // 客户端路径不显示兜底值：UNC 路径无法作为通用示例，显示出来会误导配置。
           { key: "client_path", label: "客户端路径", type: "text", noFallback: true, help: "看门狗拉起客户端时使用的 EXE 路径，通常是 SMB 共享路径，例如 \\\\服务器\\RealName.SimpleClient.exe。" },
           { key: "check_seconds", label: "主检查间隔秒", min: 1, max: 3600, unit: "秒", help: "看门狗主循环多久检查一次客户端进程，负责发现客户端被关闭后重新拉起。" },
           { key: "policy_seconds", label: "策略刷新秒", min: 1, max: 86400, unit: "秒", help: "看门狗多久向后端读取一次教室启停策略和看门狗配置。教室停用或路径调整会按这个间隔生效。" },
@@ -93,7 +92,7 @@ const GROUPS = {
   },
 };
 
-// 保存按钮文案照抄 PHP：保存服务端配置 / 保存客户端配置 / 保存看门狗配置。
+// 保存按钮分别对应服务端、客户端和 Watchdog 配置。
 const SAVE_LABELS = { server: "保存服务端配置", client: "保存客户端配置", watchdog: "保存看门狗配置" };
 
 // 摊平后供 load()/save() 按组取字段，避免两处字段清单对不上。
@@ -133,7 +132,7 @@ function formatValue(group, field, value) {
   return `${value}${field.unit || ""}`;
 }
 
-// 浮层底栏：PHP 的顺序是先程序兜底值、再最小值，空值不显示。
+// 浮层底栏：当前系统的顺序是先程序兜底值、再最小值，空值不显示。
 function footerFor(group, field) {
   if (field.noFallback) return "";
   const parts = [];

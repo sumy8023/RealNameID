@@ -209,7 +209,7 @@ function round1(value) {
   return Math.round(value * 10) / 10;
 }
 
-// 单个节点的对外状态：探测 + 回写缓存列，字段名与 PHP 的 nodeStatus 一致。
+// 单个节点的对外状态：探测并回写缓存列，字段名在所有节点中保持一致。
 export async function nodeStatus(node) {
   const probe = await probeNode(node.node_code, node.node_address, node.register_key);
   await writeStatus(node.node_code, probe.online, probe.message);

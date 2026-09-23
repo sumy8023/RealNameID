@@ -52,7 +52,7 @@ const STATS_KEYS = [
   "today_log_count",
 ];
 
-// 供写操作透传：浏览器提交什么就转给节点什么，由节点做最终夹取，和 PHP 的行为一致。
+// 供写操作透传：浏览器提交什么就转给节点什么，由节点做最终校验和夹取。
 function forwardPayload(req) {
   return buildPayload(readParams(req));
 }
@@ -100,7 +100,7 @@ export function createRouter() {
   router.all("/node_status", async (req, res) => {
     const params = readParams(req);
     const requested = text(params, "node_code");
-    // 编号写错不等于"只查这个节点"，按 PHP 的 listNodeInput 语义退化成查全部。
+    // 编号写错不等于"只查这个节点"，按统一的节点筛选规则退化成查全部。
     const effective = requested && NODE_CODE_RE.test(requested) && !isReservedNodeCode(requested) ? requested : "";
     const nodes = await refreshNodeStatuses(effective);
     const onlineCount = nodes.filter((item) => item.online).length;
@@ -201,7 +201,7 @@ export function createRouter() {
     await ensureNodesTable();
     const nodeCode = text(readParams(req), "node_code");
     if (!nodeCode || nodeCode.toUpperCase() === "GLOBAL") throw new ApiError("不能删除 GLOBAL 默认配置");
-    // PHP 删不存在的编号也会回成功，这里改成明确拒绝。
+    // 管理后台 删不存在的编号也会回成功，这里改成明确拒绝。
     const node = await registeredNode(nodeCode);
     if (!node) throw new ApiError("节点不存在");
     await deleteNode(nodeCode);

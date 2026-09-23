@@ -1,4 +1,4 @@
-﻿using System.Configuration;
+using System.Configuration;
 using System.Threading;
 using System.Windows;
 
@@ -85,4 +85,4 @@ public partial class App : System.Windows.Application
             _ownsSingleInstanceMutex = false;
         }
     }
-}\n
+}

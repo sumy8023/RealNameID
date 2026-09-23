@@ -596,20 +596,13 @@ function pageSpec(payload) {
   const limit = intValue(payload.limit, 20, 1, 5000);
   return { page, limit, offset: (page - 1) * limit };
 }
-// 管理后台写日志的来源标识。灰度期遗留 PHP 后台仍写历史值 PHP后台，
-// 所以按"管理后台"筛选时两个值都要命中，否则切换前的日志会在列表里消失。
+// 管理后台写日志的来源标识。
 const ADMIN_LOG_SOURCE = "Vue后台";
-const LEGACY_ADMIN_LOG_SOURCE = "PHP后台";
 
 function addEqual(where, params, column, value) { const valueText = text(value); if (valueText !== "") { where.push(`${column} = ?`); params.push(value); } }
 function addLogSource(where, params, value) {
   const valueText = text(value);
   if (!valueText) return;
-  if (valueText === ADMIN_LOG_SOURCE || valueText === LEGACY_ADMIN_LOG_SOURCE) {
-    where.push("log_source IN (?, ?)");
-    params.push(ADMIN_LOG_SOURCE, LEGACY_ADMIN_LOG_SOURCE);
-    return;
-  }
   addEqual(where, params, "log_source", valueText);
 }
 function addLike(where, params, columns, value) { const valueText = text(value); if (!valueText) return; where.push(`(${columns.map((column) => `${column} LIKE ?`).join(" OR ")})`); for (let index = 0; index < columns.length; index += 1) params.push(`%${valueText}%`); }

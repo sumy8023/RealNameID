@@ -12,7 +12,7 @@ import {
 } from "./validate.js";
 import { ensureNodesTable, preferredNodeCode, probeNode, registeredNode, registeredNodes } from "./nodes.js";
 
-// 单个节点请求：签名、发送、校验身份，任何一步失败都抛 ApiError，文案与 PHP 保持一致。
+// 单个节点请求负责签名、发送和身份校验，任何一步失败都抛出 ApiError。
 export async function nodeAdminRequest(node, action, payload) {
   const address = normalizeNodeAddress(node.node_address);
   const registerKey = String(node.register_key || "").trim();
@@ -33,7 +33,7 @@ export async function nodeAdminRequest(node, action, payload) {
       timeoutMs: config.node.connectTimeoutMs + config.node.responseTimeoutMs,
     });
   } catch (error) {
-    if (error instanceof NodeTimeoutError) throw new ApiError("节点数据库操作超时，未回退到PHP本地库");
+    if (error instanceof NodeTimeoutError) throw new ApiError("节点数据库操作超时，未回退到本地业务库");
     throw new ApiError("节点数据库代理不可用，请检查后端服务");
   }
 

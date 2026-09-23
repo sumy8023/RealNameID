@@ -1,6 +1,6 @@
 import os from "node:os";
 
-// 节点运行指标只保存在进程内，不写入业务库；PHP读取受注册密钥保护的健康接口。
+// 节点运行指标只保存在进程内，不写入业务库；管理后台读取受注册密钥保护的健康接口。
 let httpServer = null;
 let activeRequestCount = 0;
 let totalRequestCount = 0;

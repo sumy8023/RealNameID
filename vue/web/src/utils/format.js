@@ -1,4 +1,4 @@
-// laydate 在 PHP 后台用的是 "YYYY-MM-DD - YYYY-MM-DD"，BFF 也只认这一种；
+// 日期范围统一使用 "YYYY-MM-DD - YYYY-MM-DD" 格式；
 // 这里集中转换，避免每个页面各写一遍日期拼接。
 export function rangeToParam(range) {
   if (!Array.isArray(range) || range.length < 2) return "";

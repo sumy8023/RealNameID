@@ -6,8 +6,8 @@ import { ApiError } from "./envelope.js";
 const adminTable = `\`${config.tables.admins}\``;
 const attemptTable = `\`${config.tables.loginAttempts}\``;
 
-// 复用校区后台账号：不新建管理员表、不加角色，登录即全权（与 PHP 后台现状一致）。
-// 登录时序也保持和 LoginAction 一致，两个后台共享 tp_login_attempts 的爆破计数。
+// 复用账号库中的管理员账号：不新建管理员表、不加角色，登录后按系统权限操作。
+// 登录失败计数写入 tp_login_attempts，所有后台入口共享同一份状态。
 
 const sessions = new Map();
 
@@ -15,7 +15,7 @@ function md5(value) {
   return crypto.createHash("md5").update(String(value), "utf8").digest("hex");
 }
 
-// 与 PHP __lowPass 同一条正则：至少数字+小写+大写，长度 6 起。
+// 管理员密码至少包含数字、小写字母和大写字母，长度 6 起。
 function isWeakPassword(password) {
   return !/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/.test(String(password || ""));
 }
